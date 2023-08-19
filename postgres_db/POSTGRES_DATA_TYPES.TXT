@@ -1,3 +1,18 @@
+// type NUTRITIONAL_INFO {
+// }
+
+
+Commands:
+
+- Prisma DB Studio
+npx prisma studio
+
+- Sync DB pull
+npx prisma db pull
+
+- Sync DB push
+npx prisma db push
+
 https://www.youtube.com/watch?v=85pG_pDkITY
 
 VARCHAR          -> any length

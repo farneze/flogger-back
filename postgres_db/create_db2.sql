@@ -19,26 +19,38 @@ CREATE TYPE flogger.CONSTRUCTOR_TYPE AS ENUM
 CREATE TYPE flogger.PORTION_TYPE AS ENUM
 ('unit', 'kilograms', 'grams', 'liter', 'mililiter');
 
-
-CREATE TABLE flogger.users(
-	id 			SERIAL,
-	first_name	VARCHAR(50),
-	last_name	VARCHAR(50),
-	nickname	VARCHAR(20)     NOT NULL,
-	years		SMALLINT        NOT NULL,
-	last_login	TIMESTAMPTZ,
-	created_at	TIMESTAMPTZ     NOT NULL DEFAULT current_timestamp,
-	updated_at	TIMESTAMPTZ,
-
-    PRIMARY KEY (id)
+CREATE TYPE flogger.NUTRITIONAL_INFO AS (
+    calories        INT,
+    carbohydrates   NUMERIC(5, 2),
+    protein         NUMERIC(5, 2),
+    fat             NUMERIC(5, 2),
+    sugar           NUMERIC(5, 2)
 );
 
-CREATE TABLE flogger.country(
-    id 			    SERIAL,
-    name            VARCHAR,
-    iso_3166_code   VARCHAR,
-    flag            VARCHAR,
-    created_at      TIMESTAMPTZ     NOT NULL DEFAULT current_timestamp,
+CREATE TYPE flogger.FOOD_INFO AS (
+    constructor_type    flogger.CONSTRUCTOR_TYPE,
+    portion_type        flogger.PORTION_TYPE,
+    portion_quantity X   NUMERIC(5, 2),
+    total_quantity      NUMERIC(5, 2),
+    price               NUMERIC(5, 2)
+);
+
+CREATE TYPE flogger.FOOD_LIST AS (
+    id_food     INT,
+    quantity    INT
+);
+
+CREATE TABLE flogger.users(
+	id 			    SERIAL,
+	first_name	    VARCHAR(50),
+	last_name	    VARCHAR(50),
+	nickname	    VARCHAR(20)                     NOT NULL,
+	years		    SMALLINT,
+    weight          NUMERIC(5, 2)                   NOT NULL,
+    daily_intake    flogger.NUTRITIONAL_INFO  NOT NULL,
+	last_login	    TIMESTAMPTZ,
+	created_at	    TIMESTAMPTZ                     NOT NULL DEFAULT current_timestamp,
+	updated_at	    TIMESTAMPTZ,
 
     PRIMARY KEY (id)
 );
@@ -49,37 +61,24 @@ CREATE TABLE flogger.foods(
     name                VARCHAR(100)        NOT NULL,
     description	        VARCHAR,
     image	            VARCHAR,
-    calories	        REAL                NOT NULL,
-    carbohydrates	    REAL                NOT NULL,
-    protein	            REAL                NOT NULL,
-    fat	                REAL                NOT NULL,
-    sugar	            REAL                NOT NULL,
-    portion_type	    flogger.PORTION_TYPE        NOT NULL,
-    constructor_type	flogger.CONSTRUCTOR_TYPE    NOT NULL,
-    portion_quantity	SMALLINT            NOT NULL,
-    price	            SMALLINT            NOT NULL,
-    unit	            SMALLINT            NOT NULL,
-    is_dish	            BOOLEAN             NOT NULL,
-    server_default	    BOOLEAN,
-    id_country	        INTEGER             NOT NULL,
+    nutritional_info    flogger.NUTRITIONAL_INFO,
+    food_info           flogger.FOOD_INFO,
     created_at	        TIMESTAMPTZ         NOT NULL DEFAULT current_timestamp,
     updated_at	        TIMESTAMPTZ,
 
     PRIMARY KEY (id),
-    FOREIGN KEY (id_users) REFERENCES flogger.users(id),
-    FOREIGN KEY (id_country) REFERENCES flogger.country(id)
+    FOREIGN KEY (id_users) REFERENCES flogger.users(id)
 );
 
 CREATE TABLE flogger.dish(
     id 			        SERIAL,
-    id_users	        INTEGER         NOT NULL,
     name                VARCHAR(100)    NOT NULL,
     description	        VARCHAR,
+    foods               flogger.FOOD_LIST[],
     created_at	        TIMESTAMPTZ     NOT NULL DEFAULT current_timestamp,
     updated_at	        TIMESTAMPTZ,
 
-    PRIMARY KEY (id),
-    FOREIGN KEY (id_users) REFERENCES flogger.users(id)
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE flogger.consumed(
@@ -94,21 +93,9 @@ CREATE TABLE flogger.consumed(
     FOREIGN KEY (id_food) REFERENCES flogger.foods(id)
 );
 
-CREATE TABLE flogger.dish_has_foods(
-    id_dish     INTEGER     NOT NULL,
-    id_food     INTEGER     NOT NULL,
-    quantity    SMALLINT    NOT NULL,
-    created_at  TIMESTAMPTZ NOT NULL DEFAULT current_timestamp,
-
-    PRIMARY KEY (id_dish, id_food),
-    FOREIGN KEY (id_dish) REFERENCES flogger.dish(id),
-    FOREIGN KEY (id_food) REFERENCES flogger.foods(id)
-);
-
-
-INSERT INTO flogger.users(nickname, years, last_login)
-VALUES ('Tutu', 35, current_timestamp);
-
+INSERT INTO flogger.users(nickname, weight, daily_intake, created_at)
+VALUES ('Tutu', 133, JSONB_BUILD_OBJECT('200', '0.8', '0.8', '0.8', '0.8'), current_timestamp);
+    
 
 -- EXAMPLES
 

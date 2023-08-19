@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model consumed {
+  id_dish    Int
+  id_food    Int
+  quantity   Int      @db.SmallInt
+  eaten_at   DateTime @db.Timestamptz(6)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  dish       dish     @relation(fields: [id_dish], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  foods      foods    @relation(fields: [id_food], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([id_dish, id_food])
+}
+
+model country {
+  id            Int      @id @default(autoincrement())
+  name          String?  @db.VarChar
+  iso_3166_code String?  @db.VarChar
+  flag          String?  @db.VarChar
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  foods         foods[]
+}
+
+model dish {
+  id             Int              @id @default(autoincrement())
+  id_users       Int
+  name           String           @db.VarChar(100)
+  description    String?          @db.VarChar
+  created_at     DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime?        @db.Timestamptz(6)
+  consumed       consumed[]
+  users          users            @relation(fields: [id_users], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  dish_has_foods dish_has_foods[]
+}
+
+model dish_has_foods {
+  id_dish    Int
+  id_food    Int
+  quantity   Int      @db.SmallInt
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  dish       dish     @relation(fields: [id_dish], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  foods      foods    @relation(fields: [id_food], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([id_dish, id_food])
+}
+
+model foods {
+  id               Int              @id @default(autoincrement())
+  id_users         Int
+  name             String           @db.VarChar(100)
+  description      String?          @db.VarChar
+  image            String?          @db.VarChar
+  calories         Float            @db.Real
+  carbohydrates    Float            @db.Real
+  protein          Float            @db.Real
+  fat              Float            @db.Real
+  sugar            Float            @db.Real
+  portion_type     portion_type
+  constructor_type constructor_type
+  portion_quantity Int              @db.SmallInt
+  price            Int              @db.SmallInt
+  unit             Int              @db.SmallInt
+  is_dish          Boolean
+  server_default   Boolean?
+  id_country       Int
+  created_at       DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime?        @db.Timestamptz(6)
+  consumed         consumed[]
+  dish_has_foods   dish_has_foods[]
+  country          country          @relation(fields: [id_country], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users            users            @relation(fields: [id_users], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model users {
+  id         Int       @id @default(autoincrement())
+  first_name String?   @db.VarChar(50)
+  last_name  String?   @db.VarChar(50)
+  nickname   String    @db.VarChar(20)
+  years      Int       @db.SmallInt
+  last_login DateTime? @db.Timestamptz(6)
+  created_at DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at DateTime? @db.Timestamptz(6)
+  dish       dish[]
+  foods      foods[]
+}
+
+enum constructor_type {
+  builder
+  regulatory
+  energy_foods
+}
+
+enum portion_type {
+  unit
+  kilograms
+  grams
+  liter
+  mililiter
+}
