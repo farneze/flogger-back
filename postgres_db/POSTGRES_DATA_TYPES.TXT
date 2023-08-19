@@ -1,0 +1,52 @@
+https://www.youtube.com/watch?v=85pG_pDkITY
+
+VARCHAR          -> any length
+VARCHAR(x)       -> x length
+CHAR(x)          -> x length
+SMALLINT
+TEXT             -> any length
+CURRENCY
+BINARY
+JSON
+RANGE
+GEOMETRIC
+ARRAYS
+XML
+UUID
+
+SMALLSERIAL PRIMARY KEY -> for ID column
+                 -> 1 to 32767 length
+SERIAL PRIMARY KEY -> for ID column
+                 -> 1 to 2147483647 length
+BIGSERIAL PRIMARY KEY -> for ID column
+                 -> 1 to 9223372036854775807 length
+
+(above, same for INT but with minus too, eg, -32767 to 32767 length)
+SMALLINT
+INT
+BIGINT
+
+DECIMAL          -> 131072 Whole digits and 16383 after decimal
+NUMERIC          -> 131072 Whole digits and 16383 after decimal
+REAL             -> 1e-37 to 1E37 (6 places of precision)
+DOUBLE PRECISION -> 1E-307 to 1E308 (15 places of precision, less precise than decimal)
+FLOAT            -> same as double
+
+TRUE, 1, t, y, yes, on
+FALSE, 0, f, n, no, off
+NULL
+
+DATE -> 1974-12-21
+TIME
+     '1:30:30 PM'::TIME WITHOUT TIME ZONE -> 13:30:30
+     01:30 AM EST -> 01:30-5:00 (UTC Format)
+     01:30 PM PST -> 01:30-8:00
+     01:30 PM UTC -> 01:30+00:00
+     '01:30:30 PM EST'::TIME WITHOUT TIME ZONE -> 13:30:30-5:00
+TIMESTAMP
+     'DEC-21-1974 1:30:30 PM EST'::TIMESTAMP WITH TIME ZONE -> 1974-12-21 13:30-5:00
+INTERVAL
+     Represents a duration of time    
+     '1 day'::INTERVAL -> 01:00
+     '1 D 1 H 1 M 1 S'::INTERVAL -> 01:01:01:01
+     You can add and subtract intervals
