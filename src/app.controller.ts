@@ -1,21 +1,21 @@
-import { Controller, Get } from '@nestjs/common';
-// import { AppService } from './app.service';
+import { Body, Controller, Get } from '@nestjs/common';
 import { PrismaService } from './database/prisma.service';
+import { GetUserBody } from './dtos/get-user';
 
-@Controller()
+@Controller('app')
 export class AppController {
-  // constructor(private readonly appService: AppService) {}
   constructor(private prisma: PrismaService) {}
 
-  @Get()
-  async getHello(): Promise<any> {
-    const user = await this.prisma.users.findFirst({
+  @Get('get-user')
+  async getUser(@Body() body: GetUserBody) {
+    const { id } = body;
+
+    const users = await this.prisma.users.findFirst({
       where: {
-        id: 1,
+        id,
       },
     });
 
-    return user;
-    // return this.appService.getHello();
+    return { users };
   }
 }

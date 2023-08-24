@@ -19,15 +19,6 @@ model consumed {
   @@id([id_dish, id_food])
 }
 
-model country {
-  id            Int      @id @default(autoincrement())
-  name          String?  @db.VarChar
-  iso_3166_code String?  @db.VarChar
-  flag          String?  @db.VarChar
-  created_at    DateTime @default(now()) @db.Timestamptz(6)
-  foods         foods[]
-}
-
 model dish {
   id             Int              @id @default(autoincrement())
   id_users       Int
@@ -67,14 +58,10 @@ model foods {
   portion_quantity Int              @db.SmallInt
   price            Int              @db.SmallInt
   unit             Int              @db.SmallInt
-  is_dish          Boolean
-  server_default   Boolean?
-  id_country       Int
   created_at       DateTime         @default(now()) @db.Timestamptz(6)
   updated_at       DateTime?        @db.Timestamptz(6)
   consumed         consumed[]
   dish_has_foods   dish_has_foods[]
-  country          country          @relation(fields: [id_country], references: [id], onDelete: NoAction, onUpdate: NoAction)
   users            users            @relation(fields: [id_users], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
@@ -83,7 +70,7 @@ model users {
   first_name String?   @db.VarChar(50)
   last_name  String?   @db.VarChar(50)
   nickname   String    @db.VarChar(20)
-  years      Int       @db.SmallInt
+  age        Int       @db.SmallInt
   last_login DateTime? @db.Timestamptz(6)
   created_at DateTime  @default(now()) @db.Timestamptz(6)
   updated_at DateTime? @db.Timestamptz(6)
