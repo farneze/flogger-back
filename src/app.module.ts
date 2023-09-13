@@ -1,17 +1,19 @@
-import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+
+import { PrismaModule } from './prisma/prisma.module';
 import { AppController } from './app.controller';
-import { PrismaService } from './database/prisma.service';
-import { UserRepository } from './repositories/user-repository';
-import { PrismaUserRepository } from './repositories/prisma/prisma-user-repository';
+import { AuthModule } from './auth/auth.module';
+import { Module } from '@nestjs/common';
+import { AuthRepository } from './auth/repositories/auth.repository';
+import { PrismaAuthRepository } from './prisma/repositories/prisma-auth.repository';
 
 @Module({
-  imports: [],
+  imports: [ConfigModule.forRoot({}), AuthModule, PrismaModule],
   controllers: [AppController],
   providers: [
-    PrismaService,
     {
-      provide: UserRepository,
-      useClass: PrismaUserRepository,
+      provide: AuthRepository,
+      useClass: PrismaAuthRepository,
     },
   ],
 })

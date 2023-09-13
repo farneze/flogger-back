@@ -19,23 +19,24 @@ CREATE TYPE flogger.CONSTRUCTOR_TYPE AS ENUM
 CREATE TYPE flogger.PORTION_TYPE AS ENUM
 ('unit', 'kilograms', 'grams', 'liter', 'mililiter');
 
-
 CREATE TABLE flogger.users(
 	id 			SERIAL,
-	first_name	VARCHAR(50),
-	last_name	VARCHAR(50),
+	firstName	VARCHAR(50),
+	lastName	VARCHAR(50),
 	nickname	VARCHAR(20)     NOT NULL,
 	age		    SMALLINT        NOT NULL,
-	last_login	TIMESTAMPTZ,
-	created_at	TIMESTAMPTZ     NOT NULL DEFAULT current_timestamp,
-	updated_at	TIMESTAMPTZ,
+    email       VARCHAR(50)     UNIQUE,
+    hash        VARCHAR(100)    NOT NULL,
+	lastLogin	TIMESTAMPTZ,
+	createdAt	TIMESTAMPTZ     NOT NULL DEFAULT current_timestamp,
+	updatedAt	TIMESTAMPTZ,
 
     PRIMARY KEY (id)
 );
 
 CREATE TABLE flogger.foods(
     id 			        SERIAL,
-    id_users	        INTEGER             NOT NULL,
+    idUsers	            INTEGER             NOT NULL,
     name                VARCHAR(100)        NOT NULL,
     description	        VARCHAR,
     image	            VARCHAR,
@@ -44,54 +45,103 @@ CREATE TABLE flogger.foods(
     protein	            REAL                NOT NULL,
     fat	                REAL                NOT NULL,
     sugar	            REAL                NOT NULL,
-    portion_type	    flogger.PORTION_TYPE        NOT NULL,
-    constructor_type	flogger.CONSTRUCTOR_TYPE    NOT NULL,
-    portion_quantity	SMALLINT            NOT NULL,
+    portionType	        flogger.PORTION_TYPE        NOT NULL,
+    constructorType	    flogger.CONSTRUCTOR_TYPE    NOT NULL,
+    portionQuantity     SMALLINT            NOT NULL,
     price	            SMALLINT            NOT NULL,
     unit	            SMALLINT            NOT NULL,
-    created_at	        TIMESTAMPTZ         NOT NULL DEFAULT current_timestamp,
-    updated_at	        TIMESTAMPTZ,
+    createdAt	        TIMESTAMPTZ         NOT NULL DEFAULT current_timestamp,
+    updatedAt	        TIMESTAMPTZ,
 
     PRIMARY KEY (id),
-    FOREIGN KEY (id_users) REFERENCES flogger.users(id)
+    FOREIGN KEY (idUsers) REFERENCES flogger.users(id)
 );
 
 CREATE TABLE flogger.dish(
-    id 			        SERIAL,
-    id_users	        INTEGER         NOT NULL,
-    name                VARCHAR(100)    NOT NULL,
-    description	        VARCHAR,
-    created_at	        TIMESTAMPTZ     NOT NULL DEFAULT current_timestamp,
-    updated_at	        TIMESTAMPTZ,
+    id 			SERIAL,
+    idUsers	    INTEGER         NOT NULL,
+    name        VARCHAR(100)    NOT NULL,
+    description VARCHAR,
+    createdAt	TIMESTAMPTZ     NOT NULL DEFAULT current_timestamp,
+    updatedAt	TIMESTAMPTZ,
 
     PRIMARY KEY (id),
-    FOREIGN KEY (id_users) REFERENCES flogger.users(id)
+    FOREIGN KEY (idUsers) REFERENCES flogger.users(id)
+);
+
+CREATE TABLE flogger.dishHasFoods(
+    id 		    SERIAL,
+    idDish      INTEGER     NOT NULL,
+    idFood      INTEGER     NOT NULL,
+    quantity    SMALLINT    NOT NULL,
+    createdAt   TIMESTAMPTZ NOT NULL DEFAULT current_timestamp,
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (idDish) REFERENCES flogger.dish(id),
+    FOREIGN KEY (idFood) REFERENCES flogger.foods(id)
 );
 
 CREATE TABLE flogger.consumed(
-    id_dish     INTEGER     NOT NULL,
-    id_food     INTEGER     NOT NULL,
+    id 		    SERIAL,
+    idDish      INTEGER     NOT NULL,
     quantity    SMALLINT    NOT NULL,
-    eaten_at    TIMESTAMPTZ NOT NULL,
-    created_at  TIMESTAMPTZ NOT NULL DEFAULT current_timestamp,
+    eatenAt     TIMESTAMPTZ NOT NULL,
+    createdAt   TIMESTAMPTZ NOT NULL DEFAULT current_timestamp,
     
-    PRIMARY KEY (id_dish, id_food),
-    FOREIGN KEY (id_dish) REFERENCES flogger.dish(id),
-    FOREIGN KEY (id_food) REFERENCES flogger.foods(id)
+    PRIMARY KEY (id),
+    FOREIGN KEY (idDish) REFERENCES flogger.dish(id)
 );
 
-CREATE TABLE flogger.dish_has_foods(
-    id_dish     INTEGER     NOT NULL,
-    id_food     INTEGER     NOT NULL,
-    quantity    SMALLINT    NOT NULL,
-    created_at  TIMESTAMPTZ NOT NULL DEFAULT current_timestamp,
+INSERT INTO flogger.users(nickname, age, email, hash)
+VALUES ('Tutu', 35, 'arthur@hotmal.com', 'ausdhasuighsdufygsd');
 
-    PRIMARY KEY (id_dish, id_food),
-    FOREIGN KEY (id_dish) REFERENCES flogger.dish(id),
-    FOREIGN KEY (id_food) REFERENCES flogger.foods(id)
-);
+insert into flogger.foods(name, idUsers, calories, carbohydrates, protein, fat, sugar, portionType, constructorType, portionQuantity, price, unit)
+VALUES ('batata', 1, 5, 6, 7, 8, 9, 'unit', 'builder', 10, 1, 1);
 
+insert into flogger.foods(name, idUsers, calories, carbohydrates, protein, fat, sugar, portionType, constructorType, portionQuantity, price, unit)
+VALUES ('ovo', 1, 1, 2, 3, 4, 5, 'grams', 'energy_foods', 11, 2, 1);
 
-INSERT INTO flogger.users(nickname, age, last_login)
-VALUES ('Tutu', 35, current_timestamp);
+insert into flogger.foods(name, idUsers, calories, carbohydrates, protein, fat, sugar, portionType, constructorType, portionQuantity, price, unit)
+VALUES ('leite', 1, 3, 2, 4, 1, 5, 'liter', 'regulatory', 81, 20, 17);
 
+insert into flogger.dish(name, idUsers)    
+VALUES ('batata com ovo', 1);
+
+insert into flogger.dish(name, idUsers)
+VALUES ('ovo com leite', 1);
+
+insert into flogger.dish(name, idUsers)
+VALUES ('leite com batata', 1);
+
+insert into flogger.dish(name, idUsers)
+VALUES ('batata', 1);
+
+insert into flogger.dishHasFoods(idDish, idFood, quantity)
+VALUES (1, 1, 1);
+
+insert into flogger.dishHasFoods(idDish, idFood, quantity)
+VALUES (1, 2, 2);
+
+insert into flogger.dishHasFoods(idDish, idFood, quantity)
+VALUES (2, 2, 3);
+
+insert into flogger.dishHasFoods(idDish, idFood, quantity)
+VALUES (2, 3, 4);
+
+insert into flogger.dishHasFoods(idDish, idFood, quantity)
+VALUES (3, 2, 5);
+
+insert into flogger.dishHasFoods(idDish, idFood, quantity)
+VALUES (3, 1, 6);
+
+insert into flogger.dishHasFoods(idDish, idFood, quantity)
+VALUES (4, 1, 1);
+
+insert into flogger.consumed(idDish, quantity, eatenAt)
+VALUES (1, 1, current_timestamp);
+
+insert into flogger.consumed(idDish, quantity, eatenAt)
+VALUES (3, 3, current_timestamp);
+
+insert into flogger.consumed(idDish, quantity, eatenAt)
+VALUES (3, 3, current_timestamp);
