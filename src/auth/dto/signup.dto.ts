@@ -1,16 +1,13 @@
-import { Type } from 'class-transformer';
-import {
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsEmail,
-  IsInt,
-} from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsEmail } from 'class-validator';
 
 export class AuthSignupDto {
-  @IsEmail()
+  @IsNotEmpty()
   @IsString()
-  email: string;
+  login: string;
+
+  @IsNotEmpty()
+  @IsString()
+  password: string;
 
   @IsOptional()
   @IsString()
@@ -20,16 +17,12 @@ export class AuthSignupDto {
   @IsString()
   lastname?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  nickname: string;
+  nickname?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
+  @IsEmail()
   @IsString()
-  password: string;
-
-  @IsNotEmpty()
-  @Type(() => Number)
-  @IsInt()
-  age: number;
+  email?: string;
 }

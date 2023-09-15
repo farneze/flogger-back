@@ -1,10 +1,10 @@
 export abstract class AuthRepository {
   abstract create(
-    email: string,
-    nickname: string,
+    login: string,
     password: string,
-    age: number,
     firstname?: string,
     lastname?: string,
+    nickname?: string,
+    email?: string,
   ): Promise<void>;
 }
