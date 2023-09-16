@@ -126,7 +126,7 @@ CREATE TABLE flogger.consumed(
 );
 
 INSERT INTO main.users(nickname, login, hash)
-VALUES ('Tutu', 'testlogin', 'ausdhasuighsdufygsd');
+VALUES ('Tutucuruco', 'tutudefeijao', '$argon2id$v=19$m=65536,t=3,p=4$jHn7YOxdwOq7rVWMXaHGew$sWuSZphb8n0iZr3x1GG/LezMggoEihme9TaMEp79mi0');
 
 INSERT INTO flogger.users(idUser, birthdate)
 VALUES (1, '1991-05-05 03:44:23.790 -0300');
