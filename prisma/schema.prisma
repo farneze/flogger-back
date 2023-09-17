@@ -59,8 +59,8 @@ model foods {
   sugar           Float            @db.Real
   portiontype     portion_type
   constructortype constructor_type
-  portionquantity Int              @db.SmallInt
-  price           Int              @db.SmallInt
+  portionquantity Decimal          @db.Decimal
+  price           Decimal?         @db.Decimal
   unit            Int              @db.SmallInt
   createdat       DateTime         @default(now()) @db.Timestamptz(6)
   updatedat       DateTime?        @db.Timestamptz(6)
