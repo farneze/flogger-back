@@ -5,11 +5,12 @@ CREATE SCHEMA IF NOT EXISTS "main";
 CREATE TYPE "flogger"."constructor_type" AS ENUM ('builder', 'regulatory', 'energy_foods');
 
 -- CreateEnum
-CREATE TYPE "flogger"."portion_type" AS ENUM ('unit', 'kilograms', 'grams', 'liter', 'mililiter');
+CREATE TYPE "flogger"."portion_type" AS ENUM ('unit', 'grams', 'mililiter');
 
 -- CreateTable
 CREATE TABLE "flogger"."consumed" (
     "id" SERIAL NOT NULL,
+    "iduser" INTEGER NOT NULL,
     "iddish" INTEGER NOT NULL,
     "quantity" SMALLINT NOT NULL,
     "eatenat" TIMESTAMPTZ(6) NOT NULL,
@@ -21,7 +22,7 @@ CREATE TABLE "flogger"."consumed" (
 -- CreateTable
 CREATE TABLE "flogger"."dish" (
     "id" SERIAL NOT NULL,
-    "idfloggeruser" INTEGER NOT NULL,
+    "iduser" INTEGER NOT NULL,
     "name" VARCHAR(100) NOT NULL,
     "description" VARCHAR,
     "createdat" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -44,7 +45,7 @@ CREATE TABLE "flogger"."dishhasfoods" (
 -- CreateTable
 CREATE TABLE "flogger"."foods" (
     "id" SERIAL NOT NULL,
-    "idfloggeruser" INTEGER NOT NULL,
+    "iduser" INTEGER NOT NULL,
     "name" VARCHAR(100) NOT NULL,
     "description" VARCHAR,
     "image" VARCHAR,
@@ -67,7 +68,7 @@ CREATE TABLE "flogger"."foods" (
 -- CreateTable
 CREATE TABLE "flogger"."goal" (
     "id" SERIAL NOT NULL,
-    "idfloggeruser" INTEGER NOT NULL,
+    "iduser" INTEGER NOT NULL,
     "goal" DECIMAL NOT NULL,
     "date" TIMESTAMPTZ(6) NOT NULL,
 
@@ -75,21 +76,9 @@ CREATE TABLE "flogger"."goal" (
 );
 
 -- CreateTable
-CREATE TABLE "flogger"."users" (
-    "id" SERIAL NOT NULL,
-    "iduser" INTEGER NOT NULL,
-    "birthdate" TIMESTAMPTZ(6),
-    "lastlogin" TIMESTAMPTZ(6),
-    "createdat" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedat" TIMESTAMPTZ(6),
-
-    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "flogger"."weight" (
     "id" SERIAL NOT NULL,
-    "idfloggeruser" INTEGER NOT NULL,
+    "iduser" INTEGER NOT NULL,
     "weight" DECIMAL NOT NULL,
     "date" TIMESTAMPTZ(6) NOT NULL,
 
@@ -103,8 +92,10 @@ CREATE TABLE "main"."users" (
     "lastname" VARCHAR(50),
     "nickname" VARCHAR(20) NOT NULL,
     "email" VARCHAR(50),
-    "login" VARCHAR(20),
+    "login" VARCHAR(20) NOT NULL,
     "hash" VARCHAR(100) NOT NULL,
+    "birthdate" TIMESTAMPTZ(6),
+    "lastlogin" TIMESTAMPTZ(6),
     "createdat" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedat" TIMESTAMPTZ(6),
 
@@ -118,7 +109,10 @@ CREATE UNIQUE INDEX "users_login_key" ON "main"."users"("login");
 ALTER TABLE "flogger"."consumed" ADD CONSTRAINT "consumed_iddish_fkey" FOREIGN KEY ("iddish") REFERENCES "flogger"."dish"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "flogger"."dish" ADD CONSTRAINT "dish_idfloggeruser_fkey" FOREIGN KEY ("idfloggeruser") REFERENCES "flogger"."users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "flogger"."consumed" ADD CONSTRAINT "consumed_iduser_fkey" FOREIGN KEY ("iduser") REFERENCES "main"."users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "flogger"."dish" ADD CONSTRAINT "dish_iduser_fkey" FOREIGN KEY ("iduser") REFERENCES "main"."users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE "flogger"."dishhasfoods" ADD CONSTRAINT "dishhasfoods_iddish_fkey" FOREIGN KEY ("iddish") REFERENCES "flogger"."dish"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
@@ -127,13 +121,10 @@ ALTER TABLE "flogger"."dishhasfoods" ADD CONSTRAINT "dishhasfoods_iddish_fkey" F
 ALTER TABLE "flogger"."dishhasfoods" ADD CONSTRAINT "dishhasfoods_idfood_fkey" FOREIGN KEY ("idfood") REFERENCES "flogger"."foods"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "flogger"."foods" ADD CONSTRAINT "foods_idfloggeruser_fkey" FOREIGN KEY ("idfloggeruser") REFERENCES "flogger"."users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "flogger"."foods" ADD CONSTRAINT "foods_iduser_fkey" FOREIGN KEY ("iduser") REFERENCES "main"."users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "flogger"."goal" ADD CONSTRAINT "goal_idfloggeruser_fkey" FOREIGN KEY ("idfloggeruser") REFERENCES "flogger"."users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "flogger"."goal" ADD CONSTRAINT "goal_iduser_fkey" FOREIGN KEY ("iduser") REFERENCES "main"."users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "flogger"."users" ADD CONSTRAINT "users_iduser_fkey" FOREIGN KEY ("iduser") REFERENCES "main"."users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-
--- AddForeignKey
-ALTER TABLE "flogger"."weight" ADD CONSTRAINT "weight_idfloggeruser_fkey" FOREIGN KEY ("idfloggeruser") REFERENCES "flogger"."users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "flogger"."weight" ADD CONSTRAINT "weight_iduser_fkey" FOREIGN KEY ("iduser") REFERENCES "main"."users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;

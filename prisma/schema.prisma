@@ -11,25 +11,27 @@ datasource db {
 
 model consumed {
   id        Int      @id @default(autoincrement())
+  iduser    Int
   iddish    Int
   quantity  Int      @db.SmallInt
   eatenat   DateTime @db.Timestamptz(6)
   createdat DateTime @default(now()) @db.Timestamptz(6)
   dish      dish     @relation(fields: [iddish], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users     users    @relation(fields: [iduser], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("flogger")
 }
 
 model dish {
-  id            Int            @id @default(autoincrement())
-  idfloggeruser Int
-  name          String         @db.VarChar(100)
-  description   String?        @db.VarChar
-  createdat     DateTime       @default(now()) @db.Timestamptz(6)
-  updatedat     DateTime?      @db.Timestamptz(6)
-  consumed      consumed[]
-  users         flogger_users  @relation(fields: [idfloggeruser], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  dishhasfoods  dishhasfoods[]
+  id           Int            @id @default(autoincrement())
+  iduser       Int
+  name         String         @db.VarChar(100)
+  description  String?        @db.VarChar
+  createdat    DateTime       @default(now()) @db.Timestamptz(6)
+  updatedat    DateTime?      @db.Timestamptz(6)
+  consumed     consumed[]
+  users        users          @relation(fields: [iduser], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  dishhasfoods dishhasfoods[]
 
   @@schema("flogger")
 }
@@ -48,7 +50,7 @@ model dishhasfoods {
 
 model foods {
   id              Int              @id @default(autoincrement())
-  idfloggeruser   Int
+  iduser          Int
   name            String           @db.VarChar(100)
   description     String?          @db.VarChar
   image           String?          @db.VarChar
@@ -65,61 +67,49 @@ model foods {
   createdat       DateTime         @default(now()) @db.Timestamptz(6)
   updatedat       DateTime?        @db.Timestamptz(6)
   dishhasfoods    dishhasfoods[]
-  users           flogger_users    @relation(fields: [idfloggeruser], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users           users            @relation(fields: [iduser], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("flogger")
 }
 
 model goal {
-  id            Int           @id @default(autoincrement())
-  idfloggeruser Int
-  goal          Decimal       @db.Decimal
-  date          DateTime      @db.Timestamptz(6)
-  users         flogger_users @relation(fields: [idfloggeruser], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id     Int      @id @default(autoincrement())
+  iduser Int
+  goal   Decimal  @db.Decimal
+  date   DateTime @db.Timestamptz(6)
+  users  users    @relation(fields: [iduser], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@schema("flogger")
-}
-
-model flogger_users {
-  id        Int        @id @default(autoincrement())
-  iduser    Int
-  birthdate DateTime?  @db.Timestamptz(6)
-  lastlogin DateTime?  @db.Timestamptz(6)
-  createdat DateTime   @default(now()) @db.Timestamptz(6)
-  updatedat DateTime?  @db.Timestamptz(6)
-  dish      dish[]
-  foods     foods[]
-  goal      goal[]
-  users     main_users @relation(fields: [iduser], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  weight    weight[]
-
-  @@map("users")
   @@schema("flogger")
 }
 
 model weight {
-  id            Int           @id @default(autoincrement())
-  idfloggeruser Int
-  weight        Decimal       @db.Decimal
-  date          DateTime      @db.Timestamptz(6)
-  users         flogger_users @relation(fields: [idfloggeruser], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id     Int      @id @default(autoincrement())
+  iduser Int
+  weight Decimal  @db.Decimal
+  date   DateTime @db.Timestamptz(6)
+  users  users    @relation(fields: [iduser], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("flogger")
 }
 
-model main_users {
-  id        Int             @id @default(autoincrement())
-  firstname String?         @db.VarChar(50)
-  lastname  String?         @db.VarChar(50)
-  nickname  String          @db.VarChar(20)
-  email     String?         @db.VarChar(50)
-  login     String?         @unique @db.VarChar(20)
-  hash      String          @db.VarChar(100)
-  createdat DateTime        @default(now()) @db.Timestamptz(6)
-  updatedat DateTime?       @db.Timestamptz(6)
-  users     flogger_users[]
+model users {
+  id        Int        @id @default(autoincrement())
+  firstname String?    @db.VarChar(50)
+  lastname  String?    @db.VarChar(50)
+  nickname  String     @db.VarChar(20)
+  email     String?    @db.VarChar(50)
+  login     String     @unique @db.VarChar(20)
+  hash      String     @db.VarChar(100)
+  birthdate DateTime?  @db.Timestamptz(6)
+  lastlogin DateTime?  @db.Timestamptz(6)
+  createdat DateTime   @default(now()) @db.Timestamptz(6)
+  updatedat DateTime?  @db.Timestamptz(6)
+  consumed  consumed[]
+  dish      dish[]
+  foods     foods[]
+  goal      goal[]
+  weight    weight[]
 
-  @@map("users")
   @@schema("main")
 }
 
@@ -133,9 +123,7 @@ enum constructor_type {
 
 enum portion_type {
   unit
-  kilograms
   grams
-  liter
   mililiter
 
   @@schema("flogger")

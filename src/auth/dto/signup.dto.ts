@@ -19,10 +19,20 @@ export class AuthSignupDto {
 
   @IsOptional()
   @IsString()
-  nickname?: string;
+  nickname: string;
 
   @IsOptional()
   @IsEmail()
   @IsString()
   email?: string;
+
+  @IsOptional()
+  @IsEmail()
+  @IsString()
+  birthdate?: string;
+
+  @IsOptional()
+  @IsEmail()
+  @IsString()
+  lastLogin?: string;
 }

@@ -28,9 +28,8 @@ export class AuthService {
       // hashLength: 50,
     });
     //OWASP - minimum configuration of 19 MiB of memory, an iteration count of 2, and 1 degree of parallelism.
-    console.log(dto);
     try {
-      const user = await this.db.main_users.create({
+      const user = await this.db.users.create({
         data: {
           login: dto.login,
           hash,
@@ -56,7 +55,7 @@ export class AuthService {
   }
 
   async signin(dto: AuthSigninDto): Promise<{ access_token: string }> {
-    const user = await this.db.main_users.findUnique({
+    const user = await this.db.users.findUnique({
       where: {
         login: dto.login,
       },
