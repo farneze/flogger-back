@@ -19,9 +19,11 @@ CREATE TABLE main.users(
 	lastName	VARCHAR(50),
 	nickname	VARCHAR(20)     NOT NULL,
 	email   	VARCHAR(50),
-    login       VARCHAR(20)     UNIQUE,
+    login       VARCHAR(20)     NOT NULL    UNIQUE,
     hash        VARCHAR(100)    NOT NULL,
-	createdAt	TIMESTAMPTZ     NOT NULL DEFAULT current_timestamp,
+    birthdate   TIMESTAMPTZ,
+	lastLogin	TIMESTAMPTZ,
+	createdAt	TIMESTAMPTZ     NOT NULL    DEFAULT current_timestamp,
 	updatedAt	TIMESTAMPTZ,
 
     PRIMARY KEY (id)
@@ -33,43 +35,31 @@ CREATE TYPE flogger.CONSTRUCTOR_TYPE AS ENUM
 ('builder', 'regulatory', 'energy_foods');
 
 CREATE TYPE flogger.PORTION_TYPE AS ENUM
-('unit', 'kilograms', 'grams', 'liter', 'mililiter');
+('unit', 'grams', 'mililiter');
 
-CREATE TABLE flogger.users(
-	id 			SERIAL,
-    idUser	    INTEGER         NOT NULL,
-	birthdate   TIMESTAMPTZ,
-	lastLogin	TIMESTAMPTZ,
-	createdAt	TIMESTAMPTZ     NOT NULL DEFAULT current_timestamp,
-	updatedAt	TIMESTAMPTZ,
+CREATE TABLE flogger.weight(
+    id 			        SERIAL,
+    idUser	            INTEGER             NOT NULL,
+    weight	            NUMERIC             NOT NULL,
+    date	            TIMESTAMPTZ         NOT NULL,
 
     PRIMARY KEY (id),
     FOREIGN KEY (idUser) REFERENCES main.users(id)
 );
 
-CREATE TABLE flogger.weight(
-    id 			        SERIAL,
-    idFloggerUser	    INTEGER             NOT NULL,
-    weight	            NUMERIC             NOT NULL,
-    date	            TIMESTAMPTZ         NOT NULL,
-
-    PRIMARY KEY (id),
-    FOREIGN KEY (idFloggerUser) REFERENCES flogger.users(id)
-);
-
 CREATE TABLE flogger.goal(
     id 			        SERIAL,
-    idFloggerUser	    INTEGER             NOT NULL,
+    idUser	            INTEGER             NOT NULL,
     goal	            NUMERIC             NOT NULL,
     date	            TIMESTAMPTZ         NOT NULL,
 
     PRIMARY KEY (id),
-    FOREIGN KEY (idFloggerUser) REFERENCES flogger.users(id)
+    FOREIGN KEY (idUser) REFERENCES main.users(id)
 );
 
 CREATE TABLE flogger.foods(
     id 			        SERIAL,
-    idFloggerUser	    INTEGER             NOT NULL,
+    idUser	            INTEGER             NOT NULL,
     name                VARCHAR(100)        NOT NULL,
     description	        VARCHAR,
     image	            VARCHAR,
@@ -87,19 +77,19 @@ CREATE TABLE flogger.foods(
     updatedAt	        TIMESTAMPTZ,
 
     PRIMARY KEY (id),
-    FOREIGN KEY (idFloggerUser) REFERENCES flogger.users(id)
+    FOREIGN KEY (idUser) REFERENCES main.users(id)
 );
 
 CREATE TABLE flogger.dish(
     id 			    SERIAL,
-    idFloggerUser   INTEGER         NOT NULL,
+    idUser   INTEGER         NOT NULL,
     name            VARCHAR(100)    NOT NULL,
     description     VARCHAR,
     createdAt	    TIMESTAMPTZ     NOT NULL DEFAULT current_timestamp,
     updatedAt	    TIMESTAMPTZ,
 
     PRIMARY KEY (id),
-    FOREIGN KEY (idFloggerUser) REFERENCES flogger.users(id)
+    FOREIGN KEY (idUser) REFERENCES main.users(id)
 );
 
 CREATE TABLE flogger.dishHasFoods(
@@ -116,46 +106,45 @@ CREATE TABLE flogger.dishHasFoods(
 
 CREATE TABLE flogger.consumed(
     id 		    SERIAL,
+    idUser      INTEGER     NOT NULL,
     idDish      INTEGER     NOT NULL,
     quantity    SMALLINT    NOT NULL,
     eatenAt     TIMESTAMPTZ NOT NULL,
     createdAt   TIMESTAMPTZ NOT NULL DEFAULT current_timestamp,
     
     PRIMARY KEY (id),
+    FOREIGN KEY (idUser) REFERENCES main.users(id),
     FOREIGN KEY (idDish) REFERENCES flogger.dish(id)
 );
 
-INSERT INTO main.users(nickname, login, hash)
-VALUES ('Tutucuruco', 'tutudefeijao', '$argon2id$v=19$m=65536,t=3,p=4$jHn7YOxdwOq7rVWMXaHGew$sWuSZphb8n0iZr3x1GG/LezMggoEihme9TaMEp79mi0');
+INSERT INTO main.users(nickname, birthdate, login, hash)
+VALUES ('Tutucuruco', '1991-05-05 03:44:23.790 -0300', 'tutudefeijao', '$argon2id$v=19$m=65536,t=3,p=4$jHn7YOxdwOq7rVWMXaHGew$sWuSZphb8n0iZr3x1GG/LezMggoEihme9TaMEp79mi0');
 
-INSERT INTO flogger.users(idUser, birthdate)
-VALUES (1, '1991-05-05 03:44:23.790 -0300');
-
-INSERT INTO flogger.weight(weight, idFloggerUser, date)    
+INSERT INTO flogger.weight(weight, idUser, date)    
 VALUES (133.01, 1, '2023-08-29 03:44:23.790 -0300');
 
-INSERT INTO flogger.goal(goal, idFloggerUser, date)    
+INSERT INTO flogger.goal(goal, idUser, date)    
 VALUES (2000.01, 1, '2023-08-29 03:44:23.790 -0300');
 
-INSERT INTO flogger.foods(name, idFloggerUser, calories, carbohydrates, protein, fat, sugar, portionType, constructorType, portionQuantity, price, unit)
+INSERT INTO flogger.foods(name, idUser, calories, carbohydrates, protein, fat, sugar, portionType, constructorType, portionQuantity, price, unit)
 VALUES ('batata', 1, 5, 6, 7, 8, 9, 'unit', 'builder', 10, 1, 1);
 
-INSERT INTO flogger.foods(name, idFloggerUser, calories, carbohydrates, protein, fat, sugar, portionType, constructorType, portionQuantity, price, unit)
+INSERT INTO flogger.foods(name, idUser, calories, carbohydrates, protein, fat, sugar, portionType, constructorType, portionQuantity, price, unit)
 VALUES ('ovo', 1, 1, 2, 3, 4, 5, 'grams', 'energy_foods', 11, 2, 1);
 
-INSERT INTO flogger.foods(name, idFloggerUser, calories, carbohydrates, protein, fat, sugar, portionType, constructorType, portionQuantity, price, unit)
-VALUES ('leite', 1, 3, 2, 4, 1, 5, 'liter', 'regulatory', 81, 20, 17);
+INSERT INTO flogger.foods(name, idUser, calories, carbohydrates, protein, fat, sugar, portionType, constructorType, portionQuantity, price, unit)
+VALUES ('leite', 1, 3, 2, 4, 1, 5, 'mililiter', 'regulatory', 81, 20, 17);
 
-INSERT INTO flogger.dish(name, idFloggerUser)    
+INSERT INTO flogger.dish(name, idUser)    
 VALUES ('batata com ovo', 1);
 
-INSERT INTO flogger.dish(name, idFloggerUser)
+INSERT INTO flogger.dish(name, idUser)
 VALUES ('ovo com leite', 1);
 
-INSERT INTO flogger.dish(name, idFloggerUser)
+INSERT INTO flogger.dish(name, idUser)
 VALUES ('leite com batata', 1);
 
-INSERT INTO flogger.dish(name, idFloggerUser)
+INSERT INTO flogger.dish(name, idUser)
 VALUES ('batata', 1);
 
 INSERT INTO flogger.dishHasFoods(idDish, idFood, quantity)
@@ -177,13 +166,13 @@ INSERT INTO flogger.dishHasFoods(idDish, idFood, quantity)
 VALUES (3, 1, 6);
 
 INSERT INTO flogger.dishHasFoods(idDish, idFood, quantity)
-VALUES (4, 1, 1);
+VALUES (4, 1, 2);
 
-INSERT INTO flogger.consumed(idDish, quantity, eatenAt)
-VALUES (1, 1, current_timestamp);
+INSERT INTO flogger.consumed(idUser, idDish, quantity, eatenAt)
+VALUES (1, 1, 1, current_timestamp);
 
-INSERT INTO flogger.consumed(idDish, quantity, eatenAt)
-VALUES (3, 3, current_timestamp);
+INSERT INTO flogger.consumed(idUser, idDish, quantity, eatenAt)
+VALUES (1, 3, 3, current_timestamp);
 
-INSERT INTO flogger.consumed(idDish, quantity, eatenAt)
-VALUES (3, 3, current_timestamp);
+INSERT INTO flogger.consumed(idUser, idDish, quantity, eatenAt)
+VALUES (1, 3, 3, current_timestamp);
