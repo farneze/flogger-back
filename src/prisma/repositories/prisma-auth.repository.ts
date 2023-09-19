@@ -14,7 +14,7 @@ export class PrismaAuthRepository implements AuthRepository {
     nickname?: string,
     email?: string,
   ): Promise<void> {
-    await this.prisma.main_users.create({
+    await this.prisma.users.create({
       data: {
         login,
         hash: password,

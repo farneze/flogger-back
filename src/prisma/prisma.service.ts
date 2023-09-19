@@ -38,8 +38,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       this.foods.deleteMany(),
       this.goal.deleteMany(),
       this.weight.deleteMany(),
-      this.flogger_users.deleteMany(),
-      this.main_users.deleteMany(),
+      this.users.deleteMany(),
     ]);
   }
 }
