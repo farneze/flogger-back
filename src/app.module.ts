@@ -6,7 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { Module } from '@nestjs/common';
 import { AuthRepository } from './auth/repositories/auth.repository';
 import { PrismaAuthRepository } from './prisma/repositories/prisma-auth.repository';
-import { UserController } from './user/user.controller';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -15,8 +15,9 @@ import { UserController } from './user/user.controller';
     }),
     AuthModule,
     PrismaModule,
+    UsersModule,
   ],
-  controllers: [AppController, UserController],
+  controllers: [AppController],
   providers: [
     {
       provide: AuthRepository,
