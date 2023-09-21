@@ -4,7 +4,7 @@ import * as pactum from 'pactum';
 import { INestApplication } from '@nestjs/common';
 import { ValidationPipe } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthSignupDto } from 'src/auth/dto';
+import { AuthSigninDto, AuthSignupDto } from 'src/auth/dto';
 
 describe('test 123', () => {
   let app: INestApplication;
@@ -43,59 +43,168 @@ describe('test 123', () => {
 
   describe('Auth', () => {
     describe('SignUp', () => {
-      // it.todo('Should create new user');
+      const dto: AuthSignupDto = {
+        login: 'Tutucuruco',
+        password: 'Test123',
+        email: 'a@b.com',
+        firstname: 'Arnthor',
+        lastname: 'Heyn',
+        nickname: 'Tutu',
+      };
 
-      it.todo('should throw error if');
+      pactum.stash.addDataTemplate(dto);
 
-      it('should signup user', () => {
-        const dto: AuthSignupDto = {
-          login: 'Tutucuruco',
-          password: 'Test123',
-          email: 'a@b.com',
-          firstname: 'Arnthor',
-          lastname: 'Heyn',
-          nickname: 'Tutu',
-        };
-
-        return pactum
+      it('should signup user', async () => {
+        return await pactum
           .spec()
           .post('/auth/signup')
           .withBody(dto)
           .expectStatus(201);
-        // .inspect();
       });
+
+      // SignUp Errors
+      it.todo('should throw error if login field is empty');
+      it.todo('should throw error if password field is empty');
+      it.todo('should throw error if nickname field is empty');
+      it.todo('should throw error if login is already taken');
+      it.todo('should throw error if email doesnt match pattern');
+      it.todo('should throw error if password doesnt match pattern');
     });
 
     describe('SignIn', () => {
-      it('should sign in user and get access token', () => {
-        const dto: AuthSignupDto = {
+      it('should sign in user and get access token', async () => {
+        const dto: AuthSigninDto = {
           login: 'Tutucuruco',
           password: 'Test123',
         };
 
-        return pactum
+        return await pactum
           .spec()
           .get('/auth/signin')
+          // .withQueryParams('gender', 'male')
           .withBody(dto)
           .expectStatus(200)
           .stores('userToken', 'access_token');
+        // .expectJsonLike({
+        //   "results": [
+        //     {
+        //       "gender": "male"
+        //     }
+        //   ]
+        // })
       });
+
+      // SignIn Errors
+      it.todo('should throw error if password field is empty');
+      it.todo('should throw error if account doesnt exist');
+      it.todo('should throw error if login or password doesnt match');
     });
   });
 
-  describe('User', () => {
-    describe('Get current user', () => {
-      it('should get current user data', () => {
-        return pactum
+  describe('Users', () => {
+    describe('Current user', () => {
+      it.todo('should return all users');
+
+      it('should Get current user data', async () => {
+        return await pactum
           .spec()
-          .get('/app/user/me')
+          .get('/app/users/me')
           .withHeaders({
             Authorization: 'Bearer $S{userToken}',
           })
-          .expectStatus(200);
+          .expectStatus(200)
+          .stores('userId', 'id');
       });
-      //it.todo('should pass');
+
+      it('should Edit user', async () => {
+        return await pactum
+          .spec()
+          .post('/app/users/$S{userId}')
+          .withHeaders({
+            Authorization: 'Bearer $S{userToken}',
+          })
+          .withBody({ email: 'art@bert.com' })
+          .expectStatus(200)
+          .inspect();
+      });
+
+      it.todo('should Delete user');
+
+      // Current user Errors
     });
-    // describe('Get any user', () => {});
+
+    // describe('Friends', () => {
+    //   it.todo('should Get list of users based on filters');
+    //   it.todo('should Get user profile');
+    //   it.todo('should Edit friend');
+    //   it.todo('should Delete friend');
+
+    //   // Friends Errors
+    // });
+
+    describe('Weight', () => {
+      // it('should Get list of weight based on filter', async () => {
+      //   return await pactum
+      //     .spec()
+      //     .get('/app/user/add-weight')
+      //     .withHeaders({
+      //       Authorization: 'Bearer $S{userToken}',
+      //     })
+      //     .expectStatus(200);
+      // });
+
+      it.todo('should Add weight');
+      it.todo('should Edit weight');
+      it.todo('should Remove weight');
+
+      // Weight Errors
+    });
+
+    describe('Goal', () => {
+      it.todo('should Get list of goal based on filter');
+      it.todo('should Add goal');
+      it.todo('should Edit goal');
+      it.todo('should Remove goal');
+
+      // Goal Errors
+    });
+  });
+
+  describe('Core', () => {
+    describe('Food', () => {
+      it.todo('Get list of food based on filter');
+      it.todo('Return food data');
+      it.todo('Add food');
+      it.todo('Edit food');
+      it.todo('Remove food');
+
+      // Goal Errors
+    });
+
+    describe('Dish', () => {
+      it.todo('Get list of dish based on filter');
+      it.todo('Return dish data');
+      it.todo('Add dish');
+      it.todo('Edit dish');
+      it.todo('Remove dish');
+
+      // Goal Errors
+    });
+
+    describe('Building dishes', () => {
+      it.todo('Add food to dish');
+      it.todo('Remove food from dish');
+
+      // Goal Errors
+    });
+
+    describe('Consumed', () => {
+      it.todo('Get list of consumed dishes');
+      it.todo('Add consumed dish');
+      it.todo('Edit consumed dish');
+      it.todo('Remove consumed dish');
+
+      // Goal Errors
+    });
   });
 });
